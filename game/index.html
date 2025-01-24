@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Price is Right Quiz</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f5f5fa;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+        #header {
+            position: fixed;
+            top: 0;
+            right: 0;
+            left: 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #0c2074;
+            padding: 10px 20px;
+            z-index: 1000;
+        }
+        #logo {
+            width: 100px;
+        }
+        #toolbar {
+            display: flex;
+        }
+        .toolbar-button {
+            font-size: 2em;
+            padding: 15px;
+            margin: 0 10px;
+            cursor: pointer;
+            background-color: transparent;
+            color: white;
+            border: none;
+        }
+        #content-wrapper {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            flex-grow: 1;
+            padding: 80px 20px 20px; /* Top padding for header */
+        }
+        #question {
+            font-size: 5em;
+            margin: 20px;
+            text-align: center;
+            max-width: 90%;
+        }
+        #answer {
+            font-size: 3em;
+            margin: 20px;
+            display: none;
+        }
+        #options {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin: 20px 0;
+        }
+        .option {
+            font-size: 3em;
+            padding: 20px 40px;
+            margin: 15px;
+            cursor: pointer;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 10px;
+        }
+        .button {
+            font-size: 1.5em;
+            padding: 15px 30px;
+            margin: 10px;
+            cursor: pointer;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+        }
+        #continueButton {
+            background-color: white;
+            color: #007bff;
+        }
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div id="header">
+        <img id="logo" src="usbank_logo.png" alt="US Bank Logo">
+        <div id="toolbar">
+            <button class="toolbar-button" onclick="skipQuestion()"><i class="fas fa-forward"></i></button>
+            <button class="toolbar-button" onclick="playComeOnDown()"><i class="fas fa-play"></i></button>
+            <button class="toolbar-button" onclick="playEnding()"><i class="fas fa-stop"></i></button>
+            <button class="toolbar-button" onclick="stopAllMusic()"><i class="fas fa-times-circle"></i></button>
+        </div>
+    </div>
+    <div id="content-wrapper">
+        <div id="question">Get ready to play!</div>
+        <div id="answer"></div>
+        <div id="options"></div>
+        <button class="button" id="startButton" onclick="startQuiz()">Start</button>
+        <button class="button hidden" id="continueButton" onclick="showNextQuestion()">Continue</button>
+    </div>
+
+    <audio id="correctSound" src="correct.mp3"></audio>
+    <audio id="wrongSound" src="wrong.mp3"></audio>
+    <audio id="comeOnDownSound" src="come_on_down.mp3"></audio>
+    <audio id="endingSound" src="ending.mp3"></audio>
+
+    <script type="text/javascript">
+        const questions = [
+            { 
+                question: "What is the price of Product A?", 
+                answer: "$10",
+                options: ["$5", "$10", "$15", "$20"]
+            },
+            { 
+                question: "Is Product B more expensive than Product A?", 
+                answer: "True",
+                options: ["True", "False"]
+            },
+            { 
+                question: "What is the price of Product C?", 
+                answer: "$30",
+                options: ["$20", "$25", "$30", "$35"]
+            }
+        ];
+
+        let currentQuestionIndex = 0;
+
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
+
+        function startQuiz() {
+            shuffleArray(questions);
+            showQuestion();
+            document.getElementById('startButton').classList.add('hidden');
+        }
+
+        function showQuestion() {
+            const questionElement = document.getElementById('question');
+            const answerElement = document.getElementById('answer');
+            const optionsElement = document.getElementById('options');
+
+            questionElement.textContent = questions[currentQuestionIndex].question;
+            answerElement.textContent = `Answer: ${questions[currentQuestionIndex].answer}`;
+            answerElement.style.display = 'none';
+            
+            optionsElement.innerHTML = '';
+            questions[currentQuestionIndex].options.forEach((option, index) => {
+                const button = document.createElement('button');
+                button.textContent = option;
+                button.className = 'option';
+                button.onclick = () => selectOption(index);
+                optionsElement.appendChild(button);
+            });
+
+            document.body.style.backgroundColor = '#f5f5fa';
+            document.getElementById('continueButton').classList.add('hidden');
+            document.body.style.color = '#000000';
+        }
+
+        function selectOption(index) {
+            const selectedOption = questions[currentQuestionIndex].options[index];
+            const correctAnswer = questions[currentQuestionIndex].answer;
+            const answerElement = document.getElementById('answer');
+            const optionsElement = document.getElementById('options');
+
+            answerElement.style.display = 'block';
+            optionsElement.innerHTML = '';
+
+            if (selectedOption === correctAnswer) {
+                document.body.style.backgroundColor = '#007d1e';
+                document.getElementById('correctSound').play();
+            } else {
+                document.body.style.backgroundColor = '#eb4646';
+                document.getElementById('wrongSound').play();
+            }
+
+            document.body.style.color = '#ffffff';
+            document.getElementById('continueButton').classList.remove('hidden');
+        }
+
+        function showNextQuestion() {
+            currentQuestionIndex = (currentQuestionIndex + 1) % questions.length;
+            showQuestion();
+        }
+
+        function skipQuestion() {
+            showNextQuestion();
+        }
+
+        function playComeOnDown() {
+            document.getElementById('comeOnDownSound').play();
+        }
+
+        function playEnding() {
+            document.getElementById('endingSound').play();
+        }
+
+        function stopAllMusic() {
+            const audioElements = document.getElementsByTagName('audio');
+            for (let audio of audioElements) {
+                audio.pause();
+                audio.currentTime = 0;
+            }
+        }
+    </script>
+</body>
+</html>

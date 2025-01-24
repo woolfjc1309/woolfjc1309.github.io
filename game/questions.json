@@ -1,0 +1,17 @@
+[
+    {
+        "question": "What is the price of Product A?",
+        "answer": "$10",
+        "options": ["$5", "$10", "$15", "$20"]
+    },
+    {
+        "question": "Is Product B more expensive than Product A?",
+        "answer": "True",
+        "options": ["True", "False"]
+    },
+    {
+        "question": "What is the price of Product C?",
+        "answer": "$30",
+        "options": ["$20", "$25", "$30", "$35"]
+    }
+]
